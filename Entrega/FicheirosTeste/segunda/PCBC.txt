@@ -1,0 +1,21 @@
+CypherMode test -> 16 , 16;
+
+use cypher AES;
+
+byte initVector[1,16] <- 0x12,0x34,0xff,0x35,0x93,0x43,0x12,0xf6,0x3a,0xc3,0x22,0x04,0xf1,0x35,0x11,0x93;
+
+byte temp[1,16] <- data[0,0];
+temp <- data[0,0] xor initVector;
+out[0,0] <- AES(temp);
+
+num colS <- colMaxIndex(data);
+
+increment i forEach data
+
+    ifNotEquals(i,colS)
+        temp <- data[0,i+1] xor ( data[0,i] xor out[0,i] );
+        out[0,i+1] <- AES(temp);
+
+    $ifNotEquals
+
+$forEach

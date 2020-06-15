@@ -1,0 +1,96 @@
+program(header, program, functions, className, dataSizeBlock, keySizeBlock, matrixClass) ::= <<
+<header>
+<matrixClass>
+
+<class(className, program, functions)>
+if __name__ == "__main__":
+    encripted_message = []
+    with open(sys.argv[1]) as f: message = ''.join([line for line in f.readlines()])
+    with open(sys.argv[2]) as f: key = ''.join([line for line in f.readlines()])
+    matrices = Matrix.get_array_of_matrices(str.encode(message), 1, <dataSizeBlock>)
+    for matrix in matrices:
+        encripted_matrix = <className>.Cypher(matrix, Matrix.get_array_of_matrices(str.encode(key), 1,<keySizeBlock>)[0]).matrix[0]
+        for x in encripted_matrix:
+            encripted_message.append(x)
+    with open(sys.argv[3] if len(sys.argv) > 3 else 'result.txt', 'wb') as f:
+        f.write(bytearray(encripted_message))
+>>
+
+
+headerImport(name) ::= <<
+import <name>
+
+>>
+
+class(name, program, functions) ::= <<
+class <name>:
+    @staticmethod
+    def Cypher(data, key):
+        data = Matrix(8, data)
+        key = Matrix(8, key)
+        <program>
+        print(data.to_string_hex())
+        return data.to_line()
+    
+    <functions>
+>>
+
+forLoop(var,min,max,body)::= <<
+for <var> in range(<min>,<max>):
+    <var> = Num(64, <var>)
+    <body>
+>>
+
+declare(var,value)::= <<
+<var> = <value>
+
+>>
+
+funct(name, params, body, return) ::= <<
+@staticmethod
+def <name>(<params>):
+    <body>
+    <return>
+
+>>
+
+if(cond,body)::= <<
+if <cond>:
+    <body>
+>>
+
+while(cond,body)::= <<
+while <cond>:
+    <body>
+>>
+
+assign(var,value)::= <<
+<var> = <value>
+
+>>
+
+userFunction(class, funcName, args)::= <<
+<class>.<funcName>(<args>)
+>>
+
+predefinedFunctions(class, funcName, args) ::= <<
+<class>.<funcName>(<args>)
+
+>>
+
+getPredefinedFunctions(class, funcName, args) ::= <<
+<class>.<funcName>(<args>)
+>>
+
+coordenates(x,y) ::= <<
+<x>, <y>
+>>
+
+num(representation, value)::= <<
+Num(<representation>, <value>)
+>>
+
+string(arg)::= <<
+<arg>
+>>
+

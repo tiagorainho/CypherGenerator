@@ -1,0 +1,85 @@
+Cypher AES -> 16 , 16;
+
+data <- To Matrix [data,4,4];
+
+key <- To Matrix [key,4,4];
+
+Switch Axis[data];
+Switch Axis[key];
+
+byte matrix[4,4] <-  0x2,0x3,0x1,0x1|0x1,0x2,0x3,0x1|0x1,0x1,0x2,0x3|0x3,0x1,0x1,0x2;
+data <- data xor key;
+for(num i <- 0 : 9)
+    Sub Bytes[data, Get_rijndael_s_box()];
+    data <- shiftRows(data);
+    data <- mixColumns(data,matrix);
+    key  <- keySchedule(key,i);
+    data <- data xor key;
+$for
+
+Sub Bytes[data, Get_rijndael_s_box()];
+data <- shiftRows(data);
+key  <- keySchedule(key,9);
+data <- data xor key;
+
+func out <- byte-M keySchedule(byte-M keyMatrix,num it)
+    byte newKey[4,4] <- Zeros[byte,4,4];
+    byte col1[4,1] <- Get Col from [keyMatrix,3];
+    Shift Col[col1,0,3];                                        
+    Sub Bytes[col1, Get_rijndael_s_box()];
+    col1 <- Get Col from[keyMatrix,0] xor col1 xor Get Col from [Get_rcon(),it];
+    Set Col[newKey,col1,0];
+    for(num z <- 1 : 4 )
+        col1 <- col1 xor Get Col from [keyMatrix,z];
+        Set Col[newKey,col1,z];
+    $for
+    out <- newKey;
+$func
+
+func out <- byte-M shiftRows(byte-M data)
+    Shift Row[data, 1, 1];
+    Shift Row[data, 2, 2];
+    Shift Row[data, 3, 3];
+    out <- data;
+$func
+
+func out <- byte mul_GF8(byte s,byte t)
+    byte ans <- 0x0;
+    num ind1 <- To Num [Get Value from [Get_L(),0,To Num[s]]];
+    num ind2 <- To Num [Get Value from [Get_L(),0,To Num[t]]];
+    num ind <- ind1 + ind2;
+    
+    if(ind > 255)
+        ind <- ind - 255;
+    $if
+    
+    ans <- Get Value from [Get_E(),0,ind];
+    
+    if((s = 0x0) || (t = 0x0))
+        ans <- 0x0;
+    $if
+    if(s = 0x01)
+        ans <- t;
+    $if
+    if(t = 0x01)
+        ans <- s;
+    $if
+    out <- ans;
+$func
+
+func out <- byte-M mixColumns(byte-M data,byte-M matrix)
+    byte result[4,1] <- Zeros[byte,4,1];
+    for(num k <- 0:4)
+        result <- Zeros[byte,4,1];
+        for(num s <- 0:4)
+            byte colData[4,1] <- Get Col from [data,k];
+            for(num t <- 0:4)
+                byte new <- mul_GF8(Get Value from [matrix,s,t],Get Value from[colData,t,0]);
+                byte temp <- Get Value from [result,s,0] xor new; 
+                Set Value[result,temp,s,0];
+            $for
+        $for
+        Set Col[data,result,k];
+    $for
+    out <- data;
+$func

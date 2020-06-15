@@ -1,0 +1,7 @@
+CypherMode test -> 16 , 16;
+
+use cypher AES;
+num i <- 10;
+increment p forEach data
+    out[0,p] <- AES(data[0,p]);
+$forEach

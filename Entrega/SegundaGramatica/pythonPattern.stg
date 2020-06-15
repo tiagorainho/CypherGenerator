@@ -1,0 +1,98 @@
+program(header, program, functions, dataSizeBlock, keySizeBlock, className, matrixClass) ::= <<
+import sys
+import copy
+<header>
+<matrixClass>
+
+<class(className, program, functions)>
+if __name__ == "__main__":
+    with open(sys.argv[1]) as f: message = ''.join([line for line in f.readlines()])
+    with open(sys.argv[2]) as f: key = ''.join([line for line in f.readlines()])
+    encripted_message = test.encript(Matrix.get_array_of_arrays(str.encode(message), <dataSizeBlock>), [Matrix.get_array_of_arrays(str.encode(key),<keySizeBlock>)[0]]).matrix[0]
+    with open(sys.argv[3] if len(sys.argv) > 3 else 'result.txt', 'wb') as f:
+        f.write(bytearray(encripted_message))
+>>
+
+headerImport(name) ::= <<
+import <name>
+
+>>
+
+class(name, program, functions) ::= <<
+class <name>:
+    @staticmethod
+    def encript(data, key):
+        data = Matrix(8, data)
+        key = Matrix(8, key)
+        keyCopy = copy.deepcopy(key)
+        out = Matrix.zeros("byte", data.get_height(), data.get_width())
+        <program>
+        return out.to_line()
+    
+    <functions>
+>>
+
+forLoop(var,counter,body)::= <<
+for <counter>, _ in enumerate(<var>.matrix):
+    <counter> = Num(64, <counter>)
+    <body>
+>>
+
+cypherFunc(className, data, adjust) ::= <<
+<className>.<className>.Cypher(<data>, keyCopy.matrix)<adjust>
+keyCopy = copy.deepcopy(key)
+>>
+
+declare(var,value)::= <<
+<var> = <value>
+
+>>
+
+funct(name, params, body, return) ::= <<
+@staticmethod
+def <name>(<params>):
+    <body>
+    <return>
+
+>>
+
+if(arg1,arg2,body)::= <<
+if <arg1> != <arg2>:
+    <body>
+>>
+
+while(cond,body)::= <<
+while <cond>:
+    <body>
+>>
+
+assign(var,value)::= <<
+<var> = <value>
+
+>>
+
+userFunction(class, funcName, args)::= <<
+<class>.<funcName>(<args>)
+>>
+
+predefinedFunctions(class, funcName, args) ::= <<
+<class>.<funcName>(<args>)
+
+>>
+
+getPredefinedFunctions(class, funcName, args) ::= <<
+<class>.<funcName>(<args>)
+>>
+
+coordenates(x,y) ::= <<
+<x>, <y>
+>>
+
+num(representation, value)::= <<
+Num(<representation>, <value>)
+>>
+
+string(arg)::= <<
+<arg>
+>>
+

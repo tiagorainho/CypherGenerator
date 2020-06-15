@@ -1,0 +1,17 @@
+Cypher CifraEx -> 16 , 16;
+
+data <- To Matrix [data,4,4];
+
+key <- To Matrix[key,4,4];
+
+func out <- byte-M MultXors(byte-M data,byte-M key)
+    for(0:2)
+        data <- data xor key;
+    $for
+    out <- data;
+$func
+
+data <- MultXors(data,key);
+
+
+
